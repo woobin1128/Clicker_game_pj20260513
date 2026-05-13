@@ -109,7 +109,7 @@
         
         if (imagesLoaded >= totalImages) {
             // 이미지 그리기: (이미지객체, x좌표, y좌표, 가로길이, 세로길이)
-            ctx.drawImage(yellowBoxImg, -250, -25, 250, 50);
+            ctx.drawImage(yellowBoxImg, -120, -50, 250, 50);
         } else {
             // 이미지 로드 전에는 기존처럼 노란색 상자 표시
             ctx.fillStyle = '#FFD600';
@@ -119,7 +119,7 @@
 
         // --- [빨간 상자 이미지 그리기] ---
         if (imagesLoaded >= totalImages) {
-            ctx.drawImage(redBoxImg, centerX, centerY - 150, 180, 350);
+            ctx.drawImage(redBoxImg, centerX, centerY - 150, 200, 320);
         } else {
             ctx.fillStyle = '#D32F2F';
             ctx.fillRect(centerX, centerY - 150, 180, 350);
