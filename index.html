@@ -135,15 +135,25 @@
         startBtn.style.display = 'block';
     }
 
+    // 마우스 클릭 (PC)
     window.addEventListener('mousedown', (e) => {
         if (gameActive && e.button === 0) angle -= fallAmount;
     });
 
-    startBtn.addEventListener('click', () => {
+    // 터치 (모바일)
+    window.addEventListener('touchstart', (e) => {
+        if (gameActive) {
+            angle -= fallAmount;
+            // 터치로 인한 스크롤이나 줌 방지
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false });
+
+    startBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // 버튼 클릭이 게임 터치로 이어지지 않게 방지
         angle = 0; 
         startCountdown();
     });
-
     draw();
 </script>
 </body>
