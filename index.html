@@ -60,7 +60,7 @@
     const centerY = 300; 
     
     const riseSpeed = 0.015;  
-    const fallAmount = 0.0151; 
+    const fallAmount = 0.0155; 
     const limitMaxUp = 0.8;    
     const limitMaxDown = -0.8; 
 
@@ -86,8 +86,8 @@
     function gameLoop() {
         if (!gameActive) return;
         angle += riseSpeed;
-        if (angle >= limitMaxUp) endGame("게임 실패!");
-        else if (angle <= limitMaxDown) endGame("게임 성공!");
+        if (angle >= limitMaxUp) endGame("제압 실패!");
+        else if (angle <= limitMaxDown) endGame("제압 성공!");
         draw();
         requestAnimationFrame(gameLoop);
     }
