@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>클릭커 게임</title>
+    <style>
+        /* CSS는 이전과 동일합니다 */
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; font-family: sans-serif; overflow: hidden; }
+        #game-container { position: relative; width: 800px; height: 600px; background-color: white; border: 3px solid #333; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        canvas { display: block; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: rgba(255, 255, 255, 0.9); z-index: 10; }
+        h1 { font-size: 3.5rem; margin-bottom: 30px; color: #333; }
+        button { padding: 15px 40px; font-size: 1.5rem; cursor: pointer; background-color: #ff5252; color: white; border: none; border-radius: 50px; }
+        #countdown { font-size: 6rem; font-weight: bold; color: #333; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="ui-layer">
+        <h1 id="title">그분의 선동을 막아라!</h1>
+        <div id="countdown">3</div>
+        <button id="startBtn">게임 시작</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const uiLayer = document.getElementById('ui-layer');
+    const startBtn = document.getElementById('startBtn');
+    const countdownDisplay = document.getElementById('countdown');
+    const titleDisplay = document.getElementById('title');
+
+    // --- [이미지 객체 생성] ---
+    const redBoxImg = new Image();
+    redBoxImg.src = 'Adolf.png'; // 여기에 빨간 상자 이미지 경로 입력
+
+    const yellowBoxImg = new Image();
+    yellowBoxImg.src = 'arm.png'; // 여기에 노란 상자 이미지 경로 입력
+
+    // 이미지 로드 확인용 (콘솔에서 확인 가능)
+    let imagesLoaded = 0;
+    const totalImages = 2;
+    function imageLoaded() {
+        imagesLoaded++;
+        if (imagesLoaded === totalImages) {
+            console.log("모든 이미지가 로드되었습니다.");
+            draw(); // 로드 완료 후 첫 화면 그리기
+        }
+    }
+    redBoxImg.onload = imageLoaded;
+    yellowBoxImg.onload = imageLoaded;
+    // -------------------------
+
+    let gameActive = false;
+    let angle = 0; 
+    const centerX = 450; 
+    const centerY = 300; 
+    
+    const riseSpeed = 0.015;  
+    const fallAmount = 0.08; 
+    const limitMaxUp = 0.8;    
+    const limitMaxDown = -0.8; 
+
+    function startCountdown() {
+        startBtn.style.display = 'none';
+        titleDisplay.style.display = 'none';
+        countdownDisplay.style.display = 'block';
+        let count = 3;
+        countdownDisplay.innerText = count;
+        const timer = setInterval(() => {
+            count--;
+            if (count > 0) countdownDisplay.innerText = count;
+            else {
+                clearInterval(timer);
+                countdownDisplay.style.display = 'none';
+                uiLayer.style.display = 'none';
+                gameActive = true;
+                gameLoop();
+            }
+        }, 1000);
+    }
+
+    function gameLoop() {
+        if (!gameActive) return;
+        angle += riseSpeed;
+        if (angle >= limitMaxUp) endGame("게임 실패!");
+        else if (angle <= limitMaxDown) endGame("게임 성공!");
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 가이드선
+        ctx.strokeStyle = '#eee';
+        ctx.beginPath();
+        ctx.moveTo(0, 100); ctx.lineTo(canvas.width, 100);
+        ctx.moveTo(0, 500); ctx.lineTo(canvas.width, 500);
+        ctx.stroke();
+
+        // --- [노란 상자 이미지 그리기] ---
+        ctx.save();
+        ctx.translate(centerX, centerY); 
+        ctx.rotate(angle); 
+        
+        if (imagesLoaded >= totalImages) {
+            // 이미지 그리기: (이미지객체, x좌표, y좌표, 가로길이, 세로길이)
+            ctx.drawImage(yellowBoxImg, -180, -70, 250, 160);
+        } else {
+            // 이미지 로드 전에는 기존처럼 노란색 상자 표시
+            ctx.fillStyle = '#FFD600';
+            ctx.fillRect(-250, -25, 250, 50);
+        }
+        ctx.restore();
+
+        // --- [빨간 상자 이미지 그리기] ---
+        if (imagesLoaded >= totalImages) {
+            ctx.drawImage(redBoxImg, centerX, centerY - 150, 200, 320);
+        } else {
+            ctx.fillStyle = '#D32F2F';
+            ctx.fillRect(centerX, centerY - 150, 180, 350);
+        }
+    }
+
+    function endGame(message) {
+        gameActive = false;
+        uiLayer.style.display = 'flex';
+        titleDisplay.style.display = 'block';
+        titleDisplay.innerText = message;
+        startBtn.innerText = '재도전';
+        startBtn.style.display = 'block';
+    }
+
+    window.addEventListener('mousedown', (e) => {
+        if (gameActive && e.button === 0) angle -= fallAmount;
+    });
+
+    startBtn.addEventListener('click', () => {
+        angle = 0; 
+        startCountdown();
+    });
+
+    draw();
+</script>
+</body>
+</html>
